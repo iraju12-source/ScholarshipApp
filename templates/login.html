@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Karkai Nandre</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+        }
+        .login-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+        /* Left Side: Branding Section */
+        .brand-section {
+            background: linear-gradient(135deg, #1a5276 0%, #2c3e50 100%);
+            color: white;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly; 
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .logo-row {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .brand-logo-img {
+            width: 90%; 
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .text-row {
+            width: 100%;
+        }
+
+        /* Project Info Link Styling */
+        .project-link {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: underline;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        .project-link:hover {
+            color: #f39c12; /* Accent color on hover */
+        }
+
+        /* Right Side: Form Section */
+        .form-section {
+            background-color: #f4f4f9;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+        .center-top-logo {
+            height: 160px; 
+            width: auto;
+            margin-bottom: 30px;
+        }
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .btn-login {
+            background-color: #1a5276;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn-login:hover {
+            background-color: #154360;
+            color: white;
+        }
+
+        @media (max-width: 992px) {
+            .login-container { flex-direction: column; }
+            .brand-section { height: 50%; flex: none; justify-content: center; padding: 20px; }
+            .brand-logo-img { width: 70%; margin-bottom: 20px; }
+            .center-top-logo { height: 100px; margin-top: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="brand-section">
+            <div class="logo-row">
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Main Logo" class="brand-logo-img">
+            </div>
+            <div class="text-row">
+                <h1 class="display-4 fw-bold mb-2">Karkai Nandre</h1>
+                <p class="lead mb-3">Education is the most powerful weapon which you can use to change the world.</p>
+                               
+                <div>
+                    <a href="https://anandachaitanya.org/karkai-nandre/" target="_blank" class="project-link">
+                        Click here to know about the Karkai Nandre Project
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <img src="{{ url_for('static', filename='images/ACF_logo.png') }}" alt="ACF Logo" class="center-top-logo">
+            <div class="login-box">
+                <h2 class="text-center mb-4">Account Login</h2>
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <div class="alert alert-danger py-2 small" role="alert">
+                        {{ messages[0] }}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="/login">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Username</label>
+                        <input type="text" name="username" class="form-control form-control-lg" placeholder="Enter your username" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Password</label>
+                        <input type="password" name="password" class="form-control form-control-lg" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-login w-100 mb-3">Login to Dashboard</button>
+                    
+                    <div class="text-center mt-2">
+                        <span class="text-muted small">New Student?</span> 
+                        <a href="/register" class="text-decoration-none small fw-bold" style="color: #1a5276;">Register Here</a>
+                    </div>
+                    
+                    <div class="text-center mt-3 border-top pt-2">
+                        <a href="/scholarship_details" target="_blank" class="text-decoration-none small" style="color: #1a5276; line-height: 1.4; display: block;">
+                            Click here to know the Scholarship details, Eligibility Criteria & 5-step selection process.
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

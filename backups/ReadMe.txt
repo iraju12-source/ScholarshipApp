@@ -1,0 +1,1 @@
+Every day database backup will be stored here in this folder.

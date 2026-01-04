@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ACF Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; }
+        .navbar { background-color: #1a5276; }
+        .nav-tabs .nav-link { color: #1a5276; font-weight: 500; }
+        .nav-tabs .nav-link.active { font-weight: bold; border-top: 4px solid #1a5276; }
+        .card-header { font-weight: bold; }
+        .table-responsive { background: white; border-radius: 8px; }
+        .status-badge { font-size: 0.85rem; }
+        .modal-content { background-color: #ffffff !important; border-radius: 10px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-backdrop { opacity: 0.5 !important; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark mb-4">
+        <div class="container-fluid px-4">
+            <span class="navbar-brand">Admin Panel: {{ session['name'] }}</span>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout / வெளியேறு</a>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-info alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="applications-tab" data-bs-toggle="tab" data-bs-target="#applications" type="button" role="tab">
+                    📋 Scholarship Applications
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                    👥 User Management
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="adminTabsContent">
+            <div class="tab-pane fade show active" id="applications" role="tabpanel">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <span>Scholarship Applications Control Panel</span>
+                        <span class="badge bg-secondary">{{ apps|length }} Total Applications</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle text-center">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-start">Student Name</th>
+                                        <th>District</th>
+                                        <th>Status</th>
+                                        <th>Full Profile</th>
+                                        <th>Evaluator</th>
+                                        <th>Eval Score (/80)</th>
+                                        <th style="min-width: 320px;">Final Decision</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for app in apps %}
+                                    <tr>
+                                        <td class="text-start"><div class="fw-bold">{{ app.full_name }}</div></td>
+                                        <td>{{ app.district }}</td>
+                                        <td>
+                                            <span class="badge status-badge 
+                                                {% if app.status == 'Finalized' %}bg-success
+                                                {% elif app.status == 'Evaluated' %}bg-primary
+                                                {% elif app.status == 'Assigned' %}bg-warning text-dark
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ app.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('view_application', app_id=app.id) }}" class="btn btn-outline-primary btn-sm">
+                                                🔍 View Details
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if app.status in ['Evaluated', 'Finalized'] %}
+                                                <div class="fw-bold text-dark">{{ app.evaluator_name }}</div>
+                                            {% else %}
+                                                <form action="{{ url_for('assign_evaluator') }}" method="POST" class="p-2 border rounded bg-light">
+                                                    <input type="hidden" name="app_id" value="{{ app.id }}">
+                                                    
+                                                    {% if app.assigned_to %}
+                                                        <div class="mb-1">
+                                                            <small class="text-muted d-block">Current Evaluator:</small>
+                                                            <span class="fw-bold text-primary">{{ app.evaluator_name }}</span>
+                                                        </div>
+                                                    {% endif %}
+
+                                                    <div class="d-flex gap-2 justify-content-center mt-1">
+                                                        <select name="evaluator_id" class="form-select form-select-sm" style="max-width: 140px;" required>
+                                                            <option value="">{% if app.assigned_to %}Change...{% else %}Select...{% endif %}</option>
+                                                            {% for ev in evaluators %}
+                                                                {% set ev_role = ev.role or ev['role'] %}
+                                                                {% if ev_role == 'evaluator' %}
+                                                                <option value="{{ ev.id or ev['id'] }}" {% if app.assigned_to == (ev.id or ev['id']) %}selected{% endif %}>
+                                                                    {{ ev.full_name or ev['full_name'] }}
+                                                                </option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+                                                        <button type="submit" class="btn btn-primary btn-sm">
+                                                            {% if app.assigned_to %}Re-Assign{% else %}Assign{% endif %}
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if app.evaluator_score %}
+                                                <span class="fw-bold text-primary">{{ app.evaluator_score }}</span>
+                                            {% else %}
+                                                <span class="text-muted small">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if app.status == 'Evaluated' %}
+                                            <form action="/final_approval" method="POST" enctype="multipart/form-data" class="p-2 border rounded bg-white shadow-sm text-start">
+                                                <input type="hidden" name="app_id" value="{{ app.id }}">
+                                                <div class="row g-2 mb-2">
+                                                    <div class="col-6">
+                                                        <label class="small fw-bold text-success">Interview (0-20)</label>
+                                                        <input type="number" name="interview_marks" class="form-control form-control-sm" max="20" required>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="small fw-bold">Decision</label>
+                                                        <select name="final_decision" class="form-select form-select-sm" required>
+                                                            <option value="">Choose...</option>
+                                                            <option value="Scholarship Approved">Approved</option>
+                                                            <option value="Wait Listed">Wait Listed</option>
+                                                            <option value="Rejected">Rejected</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="file" name="interview_doc" class="form-control form-control-sm" accept=".pdf" required>
+                                                </div>
+                                                <textarea name="final_comments" class="form-control form-control-sm mb-2" rows="1" placeholder="Comments" required></textarea>
+                                                <button type="submit" class="btn btn-success btn-sm w-100">Finalize Scholarship</button>
+                                            </form>
+                                            {% elif app.status == 'Finalized' %}
+                                            <div class="text-center p-2">
+                                                <span class="badge bg-success mb-2">{{ app.final_decision }}</span><br>
+                                                <div class="mt-1 small fw-bold text-dark">
+                                                    Total: <span class="text-success">{{ (app.evaluator_score|float + (app.interview_marks|default(0)|float))|round(2) }}</span> / 100
+                                                </div>
+                                                <a href="{{ url_for('download', filename=app.interview_doc) }}" target="_blank" class="small text-decoration-none">📄 View Doc</a>
+                                            </div>
+                                            {% else %}
+                                            <div class="text-center py-2 text-muted small italic">Awaiting Evaluator</div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="users" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-primary text-white">Add New User</div>
+                            <div class="card-body">
+                                <form action="{{ url_for('add_user') }}" method="POST" autocomplete="off">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Full Name</label>
+                                        <input type="text" name="full_name" class="form-control" required placeholder="Full Name">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Username</label>
+                                        <input type="text" name="username" class="form-control" required placeholder="Create Username" autocomplete="new-username">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Password</label>
+                                        <input type="password" name="password" class="form-control" required placeholder="Create Password" autocomplete="new-password">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">System Role</label>
+                                        <select name="role" class="form-select">
+                                            <option value="evaluator">Evaluator</option>
+                                            <option value="coordinator">Coordinator</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100">Create Account</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-secondary text-white">Existing System Users</div>
+                            <div class="card-body p-0">
+                                <table class="table table-striped align-middle m-0 text-center">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="text-start ps-3">Name</th>
+                                            <th>Username</th>
+                                            <th>Role</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for u in evaluators %}
+                                        {% set uid = u.id or u['id'] %}
+                                        <tr>
+                                            <td class="text-start ps-3 fw-bold">{{ u.full_name or u['full_name'] }}</td>
+                                            <td>{{ u.username or u['username'] }}</td>
+                                            <td>
+                                                <span class="badge {% if (u.role or u['role']) == 'coordinator' %}bg-info{% else %}bg-dark{% endif %}">
+                                                    {{ (u.role or u['role'])|upper }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editUser{{ uid }}">
+                                                        ✏️ Edit
+                                                    </button>
+                                                    <form action="{{ url_for('delete_user', user_id=uid) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this user?');" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger ms-1">
+                                                            🗑️ Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% for u in evaluators %}
+            {% set uid = u.id or u['id'] %}
+            {% set u_role = u.role or u['role'] %}
+            <div class="modal fade" id="editUser{{ uid }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content shadow-lg">
+                        <form action="/edit_user" method="POST" autocomplete="off">
+                            <div class="modal-header bg-light">
+                                <h5 class="modal-title">Update Account: {{ u.full_name or u['full_name'] }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" name="user_id" value="{{ uid }}">
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Full Name</label>
+                                    <input type="text" name="full_name" class="form-control" value="{{ u.full_name or u['full_name'] }}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Username</label>
+                                    <input type="text" name="username" class="form-control" value="{{ u.username or u['username'] }}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">System Role</label>
+                                    <select name="role" class="form-select" required>
+                                        <option value="evaluator" {% if u_role == 'evaluator' %}selected{% endif %}>Evaluator</option>
+                                        <option value="coordinator" {% if u_role == 'coordinator' %}selected{% endif %}>Coordinator</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Change Password</label>
+                                    <input type="password" name="password" class="form-control" placeholder="Leave empty to keep current" autocomplete="new-password">
+                                    <div class="form-text">Only fill this to reset their password.</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var hash = window.location.hash;
+            if (hash === '#users') {
+                var triggerEl = document.querySelector('#users-tab');
+                if (triggerEl) {
+                    var tab = new bootstrap.Tab(triggerEl);
+                    tab.show();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karkai Nandre Scholarship Application</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h3 { color: #333; text-align: center; }
+        .section-title { background-color: #0056b3; color: white; padding: 10px; margin-top: 20px; border-radius: 4px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; padding: 15px 20px; border: none; margin-top: 20px; width: 100%; font-size: 18px; cursor: pointer; border-radius: 4px; }
+        button:hover { background-color: #218838; }
+        .note { font-size: 0.9em; color: #666; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>KARKAI NANDRE</h1>
+    <h3>Student Scholarship Application</h3>
+
+    <form action="/submit" method="POST" enctype="multipart/form-data">
+        
+        <div class="section-title">Personal Information</div>
+        <label>Full Name</label>
+        <input type="text" name="full_name" required>
+        
+        <label>Date of Birth</label>
+        <input type="date" name="dob" required>
+        
+        <label>Gender</label>
+        <select name="gender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select>
+        
+        <label>Blood Group</label>
+        <input type="text" name="blood_group">
+
+        <label>Aadhaar Number</label>
+        <input type="text" name="aadhaar_number" required>
+
+        <label>Address</label>
+        <textarea name="address" rows="3" required></textarea>
+
+        <label>District</label>
+        <input type="text" name="district" required>
+        
+        <label>Pincode</label>
+        <input type="text" name="pincode" required>
+
+        <label>Primary Mobile</label>
+        <input type="tel" name="mobile_primary" required>
+
+        <label>Secondary Mobile (Optional)</label>
+        <input type="tel" name="mobile_secondary">
+        
+        <label>Email</label>
+        <input type="email" name="email" required>
+
+        <div class="section-title">Educational Information</div>
+        <label>SSLC School Name</label>
+        <input type="text" name="sslc_school" required>
+        
+        <label>SSLC Marks (%)</label>
+        <input type="text" name="sslc_marks" required>
+        
+        <label>HSC School Name</label>
+        <input type="text" name="hsc_school" required>
+        
+        <label>HSC Marks (%)</label>
+        <input type="text" name="hsc_marks" required>
+
+        <label>Current College Name</label>
+        <input type="text" name="current_college" required>
+
+        <label>Current Course/Major</label>
+        <input type="text" name="current_course" required>
+
+        <div class="section-title">Family Information</div>
+        <label>Father's Name</label>
+        <input type="text" name="father_name" required>
+        
+        <label>Father's Occupation</label>
+        <input type="text" name="father_occupation" required>
+        
+        <label>Mother's Name</label>
+        <input type="text" name="mother_name" required>
+        
+        <label>Mother's Occupation</label>
+        <input type="text" name="mother_occupation" required>
+
+        <label>Annual Income</label>
+        <input type="number" name="annual_income" required>
+
+        <label>Housing Type</label>
+        <select name="housing_type">
+            <option value="Own">Own House</option>
+            <option value="Rented">Rented House</option>
+        </select>
+
+        <div class="section-title">Written Test</div>
+        <div class="note">
+            Please download the question paper separately. Write your answers on paper, scan them into a single PDF, and upload it here.
+        </div>
+        <label>Upload Answer Sheet (PDF Only)</label>
+        <input type="file" name="answer_sheet" accept=".pdf" required>
+
+        <button type="submit">Submit Application</button>
+    </form>
+</div>
+
+</body>
+</html>

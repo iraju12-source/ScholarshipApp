@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration - Karkai Nandre</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+        }
+        .register-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+        /* Left Side: Instructions Panel */
+        .brand-section {
+            background: linear-gradient(135deg, #1a5276 0%, #2c3e50 100%);
+            color: white;
+            flex: 1.3; 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        .instruction-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        .instruction-card h4 {
+            color: #f39c12;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(243, 156, 18, 0.3);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .doc-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .doc-list li::before {
+            content: "✓ ";
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .test-topic {
+            margin-bottom: 18px;
+            padding-left: 12px;
+            border-left: 3px solid #f39c12;
+        }
+        .test-topic strong {
+            display: block;
+            font-size: 1.05rem;
+            margin-bottom: 4px;
+        }
+        .note-highlight {
+            background: rgba(243, 156, 18, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            font-style: italic;
+            border-left: 5px solid #f39c12;
+            line-height: 1.6;
+        }
+
+        /* Right Side: Form Section */
+        .form-section {
+            background-color: #f4f4f9;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+        .center-top-logo {
+            height: 140px; 
+            width: auto;
+            margin-bottom: 20px;
+        }
+        .register-box {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .btn-register {
+            background-color: #1a5276;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+        }
+        .btn-register:hover {
+            background-color: #154360;
+        }
+
+        @media (max-width: 992px) {
+            .register-container { flex-direction: column; }
+            .brand-section { height: auto; flex: none; padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="register-container">
+        
+        <div class="brand-section">
+            <h2 class="mb-4 fw-bold text-white">Application Instructions:</h2>
+            
+            <div class="instruction-card">
+                <h4>Required Documents (தயார் நிலையில் வைக்கவும்)</h4>
+                <p>Please keep the soft copies (Scanned/Photo) of the following ready:</p>
+                <ul class="doc-list">
+                    <li>Aadhaar Card (ஆதார் அட்டை)</li>
+                    <li>10th Std Mark Sheet (10-ஆம் வகுப்பு மதிப்பெண் பட்டியல்)</li>
+                    <li>HSC (12th) Mark Sheet (12-ஆம் வகுப்பு மதிப்பெண் பட்டியல்)</li>
+                    <li>College Mark Sheet - if applicable (கல்லூரி மதிப்பெண் பட்டியல்)</li>
+                    <li>Written Test PDF (எழுத்து தேர்வு PDF கோப்பு)</li>
+                </ul>
+            </div>
+
+            <div class="instruction-card">
+                <h4>Written Test (எழுத்து தேர்வு)</h4>
+                <p class="small mb-3"><strong>Instructions:</strong> Write answers on plain paper. Scan/Photo them into a <strong>single PDF</strong>.<br>
+                (விடைகளை தாளில் எழுதி, ஸ்கேன் செய்து ஒரே PDF கோப்பாக பதிவேற்றவும்.)</p>
+                
+                <div class="test-topic">
+                    <strong>1. உங்கள் முன்மாதிரி யார்? ஏன் அவரை தேர்ந்தெடுத்தீர்கள்?</strong>
+                    Who is your Role Model? Why did you choose them? (Min 3 pages)
+                </div>
+                <div class="test-topic">
+                    <strong>2. உங்களை பற்றியும், உங்கள் குடும்பம் மற்றும் கனவுகள் பற்றியும் எழுதுக.</strong>
+                    Write about yourself, your family, friends, and dreams. (Min 3 pages)
+                </div>
+                <div class="test-topic">
+                    <strong>3. உங்கள் எதிர்கால லட்சியம் என்ன?</strong>
+                    What is your goal in life? How do you plan to achieve it? (Min 2 pages)
+                </div>
+                <div class="test-topic">
+                    <strong>4. உங்களை கவர்ந்த சமுதாயத் தலைவர் யார்? ஏன்?</strong>
+                    Identify a social leader you admire. Why? (Min 2 pages)
+                </div>
+                <div class="test-topic">
+                    <strong>5. பொது அறிவு (சமீபத்திய செய்திகள், புத்தகம் அல்லது திரைப்படம்)</strong>
+                    General Knowledge: Recent news, favorite book, or movie. (Min 2 pages)
+                </div>
+
+                <div class="note-highlight mt-3">
+                    <strong>Note:</strong> 20% of marks will be given to this written test, so write the test sincerely and honestly.<br>
+                    (குறிப்பு: இந்த எழுத்துத் தேர்வுக்கு 20% மதிப்பெண்கள் வழங்கப்படும், எனவே தேர்வை உண்மையாகவும் நேர்மையாகவும் எழுதவும்.)
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <img src="{{ url_for('static', filename='images/ACF_logo.png') }}" alt="ACF Logo" class="center-top-logo">
+
+            <div class="register-box">
+                <h3 class="text-center mb-4">Create Account</h3>
+
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <div class="alert alert-danger py-2 small" role="alert">
+                        {{ messages[0] }}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="/register" autocomplete="off">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Full Name</label>
+                        <input type="text" name="full_name" class="form-control" placeholder="Enter full name" value="" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Username</label>
+                        <input type="text" name="username" class="form-control" placeholder="Choose username" value="" required autocomplete="new-username">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" value="" required autocomplete="new-password">
+                    </div>
+
+                    <button type="submit" class="btn btn-register w-100 mb-3">Register Now</button>
+                    
+                    <div class="text-center mt-2">
+                        <span class="text-muted small">Already registered?</span> 
+                        <a href="/login" class="text-decoration-none small fw-bold" style="color: #1a5276;">Back to Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

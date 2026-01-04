@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinator Dashboard - Karkai Nandre</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #fffaf0; }
+        /* Expanded header to full width */
+        .header-bar { background-color: #f39c12; color: white; padding: 15px 0; margin-bottom: 20px; }
+        .card-header { font-weight: bold; }
+        .table { font-size: 0.95rem; }
+        /* Helper class for small text in forms */
+        .x-small { font-size: 0.75rem; }
+        .finalize-form { max-width: 350px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="header-bar shadow-sm">
+        <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+            <h3 class="m-0">Coordinator Dashboard: {{ session['name'] }}</h3>
+            <a href="/logout" class="btn btn-light btn-sm">Logout / வெளியேறு</a>
+        </div>
+    </div>
+
+    <div class="container-fluid px-4">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              {{ messages[0] }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-dark">Scholarship Applications Management</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 5%">ID</th>
+                                <th style="width: 20%">Student Name</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 20%">Assigned Evaluator</th>
+                                <th style="width: 20%">Evaluator Review</th>
+                                <th style="width: 25%">Final Action (Interview)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in apps %}
+                            <tr>
+                                <td><small class="text-muted">#{{ app.id }}</small></td>
+                                <td>
+                                    <div class="fw-bold">{{ app.full_name }}</div>
+                                    <div class="x-small text-muted">{{ app.district }} | {{ app.mobile_primary }}</div>
+                                    <a href="/view_application/{{ app.id }}" target="_blank" class="x-small text-decoration-none">View Full Details →</a>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill 
+                                        {% if app.status == 'Submitted' %}bg-secondary
+                                        {% elif app.status == 'Assigned' %}bg-info
+                                        {% elif app.status == 'Evaluated' %}bg-primary
+                                        {% elif app.status == 'Finalized' %}bg-success
+                                        {% endif %}">
+                                        {{ app.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if app.status != 'Evaluated' and app.status != 'Finalized' %}
+                                        <form action="/assign_evaluator" method="POST" class="d-flex gap-1">
+                                            <input type="hidden" name="app_id" value="{{ app.id }}">
+                                            <select name="evaluator_id" class="form-select form-select-sm x-small" required>
+                                                <option value="">Choose Evaluator...</option>
+                                                {% for eval in evaluators %}
+                                                <option value="{{ eval.id }}" {% if app.assigned_to == eval.id %}selected{% endif %}>
+                                                    {{ eval.full_name }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn btn-outline-dark btn-sm x-small">
+                                                {% if app.assigned_to %}Re-Assign{% else %}Assign{% endif %}
+                                            </button>
+                                        </form>
+                                        {% if app.assigned_to %}
+                                            <div class="x-small text-muted mt-1 italic">Current: {{ app.evaluator_name }}</div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="fw-semibold text-dark">{{ app.evaluator_name }}</div>
+                                        <div class="x-small text-success italic">Assignment Locked ({{ app.status }})</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if app.evaluator_score %}
+                                    <div class="border rounded p-2 bg-light">
+                                        <div class="fw-bold text-primary">Score: {{ app.evaluator_score }}/80</div>
+                                        <div class="x-small text-truncate" title="{{ app.evaluator_comments }}">
+                                            "{{ app.evaluator_comments[:50] }}..."
+                                        </div>
+                                        <div class="x-small mt-1 fw-bold text-{% if app.evaluator_recommendation == 'Strongly Recommend' %}success{% else %}warning{% endif %}">
+                                            Rec: {{ app.evaluator_recommendation }}
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <span class="text-muted x-small italic">Pending Evaluation</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="finalize-form">
+                                        {% if app.status == 'Evaluated' %}
+                                        <form action="/final_approval" method="POST" enctype="multipart/form-data">
+                                            <input type="hidden" name="app_id" value="{{ app.id }}">
+                                            <div class="row g-1">
+                                                <div class="col-6">
+                                                    <input type="number" name="interview_marks" class="form-control form-control-sm x-small" placeholder="Int. Marks (20)" max="20" required>
+                                                </div>
+                                                <div class="col-6">
+                                                    <select name="final_decision" class="form-select form-select-sm x-small" required>
+                                                        <option value="Approved">Approve</option>
+                                                        <option value="Waitlisted">Waitlist</option>
+                                                        <option value="Rejected">Reject</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <input type="file" name="interview_doc" class="form-control form-control-sm x-small mt-1" accept=".pdf,.doc,.docx">
+                                                    <textarea name="final_comments" class="form-control form-control-sm x-small mt-1" rows="1" placeholder="Final comments..."></textarea>
+                                                </div>
+                                                <div class="col-12 mt-1">
+                                                    <button type="submit" class="btn btn-success btn-sm w-100 x-small fw-bold">Submit Final Decision</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                        {% elif app.status == 'Finalized' %}
+                                        <div class="bg-success-subtle p-2 border border-success rounded">
+                                            <div class="fw-bold text-success">{{ app.final_decision|upper }}</div>
+                                            <div class="x-small text-muted">Marks: {{ app.interview_marks }}/20</div>
+                                            {% if app.interview_doc %}
+                                            <a href="{{ url_for('download', filename=app.interview_doc) }}" class="btn btn-link btn-sm x-small p-0">📄 View Interview Doc</a>
+                                            {% endif %}
+                                        </div>
+                                        {% else %}
+                                        <div class="text-center py-2">
+                                            <span class="text-muted x-small italic">Pending Evaluator Submission</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not apps %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <h5>No applications found in the system.</h5>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
